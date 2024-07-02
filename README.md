@@ -1,1 +1,1 @@
-# diningPhilosopers
+# diningPhilosophers
