@@ -1,6 +1,11 @@
 {
 	"files.associations": {
 		"philo.h": "c",
-		"time.h": "c"
+		"time.h": "c",
+		"compare": "c",
+		"unistd.h": "c",
+		"stdio.h": "c",
+		"pthread.h": "c",
+		"stdbool.h": "c"
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:35:15 by darotche          #+#    #+#             */
-/*   Updated: 2024/06/20 15:56:56 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/03 21:03:56 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int is_all_digit(char *str)
 	{
 		if(!is_digit(str[i]))
 		{
-			printf("Error: Argument must be a number\n");
+			printf("Error: %s Argument must be a number\n", str);
 			return(0);
 		}
 		i++;

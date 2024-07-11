@@ -6,76 +6,65 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/02 17:46:01 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/11 20:33:11 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-pthread_mutex_t mutex;
-	
-// if time to die is reached
-// if available get first fork
-// if available get second fork 
-// eat for time to eat
-	// print message with timestamp
-	// count eat
-// sleep for time to sleep
-// think for time to think
-// repeat
-
-void	*routine(void *arg)
+pthread_t	create_philo(int philo_num, t_data *data)
 {
-	t_philo *philo = (t_philo *)arg;
-	//struct timeval tv;
-	//gettimeofday(&tv, NULL);
-	// printf("HUNGRY!!!\n");
-	// printf(RED"Philo %d\n"RESET, philo->eat_count);
-	// printf(RED"Meals = %d\n"RESET, philo.data->meals);
-	while (philo->eat_count < philo->data->meals)
-	{
-		pthread_mutex_lock(&mutex);
-		
-		//pthread_t th = pthread_self();
-		//philo->id = pthread_self();
-		//printf(RED"!!!\n"RESET);
-		printf("Philosopher %d is hungry\n", philo->left_fork);
-		philo->eat_count++;
-		
-		//long long current_time = (long long)tv.tv_sec * 1000 + tv.tv_usec / 1000;
-		//printf("%d Philosopher %d got left fork. id=%d\n", (int)time(NULL), philo->left_fork, philo->id);
-		//printf("%d Philosopher %d got right fork. id=%d\n", (int)time(NULL), philo->right_fork, philo->id);
-		//printf(YEL"%lld Philosopher %d is eating\n" RESET, current_time, philo->left_fork);
-		//printf(GRN"Eat count = %d\n"RESET, philo->eat_count);
-		pthread_mutex_unlock(&mutex);
-		
-		//printf(BLU"Philosopher %d is sleeping\n\n"RESET, philo->left_fork);
-		usleep(500);
-		//printf(CYN"Philosopher %d is thinking\n\n"RESET, philo->left_fork);
-	}
-	printf(BLU"Philosopher %d has eaten %d times\n"RESET, philo->left_fork, philo->eat_count);
-	return (NULL);
-}
-
-pthread_t	create_philo(int philo_num, pthread_mutex_t *mutex, t_data *data)
-{
-	t_philo *philo = malloc(sizeof(t_philo));
-
+	t_philo *philo = &data->philo[philo_num];
+	philo->id = philo_num;
 	philo->left_fork = philo_num;
-	philo->right_fork = (philo_num + 1) % 5;
+	philo->right_fork = (philo_num + 1) % data->num_of_philos;
 	philo->eat_count = 0;
-	philo->mutex = mutex;
+	philo->last_eat_time = get_time();
+	printf(RED"Last eat time: %ld\n" RESET, philo->last_eat_time);
 	philo->data = data;
 
-	printf(MAG"Philosopher %d is created\n"RESET, philo_num);
-	printf("Philosopher %d has entered the room\n", philo_num);
-		if (pthread_create(&philo->thread, NULL, &routine, data))
-		{
-			printf("Error: Thread creation failed\n");
-			exit(1);
-		} 
-		printf("Philosopher %d has left the room\n", philo_num);
-	return (philo->thread); 
+	if (pthread_create(&philo->thread_id, NULL, &routine, philo))
+	{
+		printf("Error: Thread creation failed\n");
+		exit(1);
+	}
+	printf(BLU"Philosopher %d is created\n"RESET, philo->left_fork);
+	printf(MAG"Philosopher left fork %d\n"RESET, philo->left_fork);
+	printf(MAG"Philosopher right fork %d\n"RESET, philo->right_fork);	
+	return (philo->thread_id); 
+}
+
+void	data_init(t_data *data, char **argv)
+{
+	int i;
+
+	i = 0;
+	data->num_of_philos = ft_atol(argv[1]);
+	data->time_to_die = ft_atol(argv[2]);
+	data->time_to_eat = ft_atol(argv[3]);
+	data->time_to_sleep = ft_atol(argv[4]);
+	data->total_meals = ft_atol(argv[5]);
+	data->dead_philo = -1;
+	data->total_served = 0;
+	data->philo = malloc(sizeof(t_philo) * data->num_of_philos);
+	data->forks = malloc(sizeof(pthread_mutex_t) * data->num_of_philos);
+	//printf("Total meals: %ld\n", data->total_meals);
+	if (!data->philo)
+	{
+		printf("Error: Memory allocation failed\n");
+		exit(1);
+	}
+	i = 0;
+	while(i < data->num_of_philos)
+	{
+		pthread_mutex_init(&data->forks[i], NULL);
+		i++;
+	}
+	pthread_mutex_init(&data->print_mutex, NULL);
+	pthread_mutex_init(&data->total_served_mutex, NULL);
+	data->start_time = get_time();
+	sleep(1);
+	data->start = true;
 }
 
 int main(int argc, char **argv)
@@ -83,31 +72,46 @@ int main(int argc, char **argv)
 	static t_data data;
 	int i;
 
-	check_input(argc, argv);	
-	data.meals = atoi(argv[2]);	
-	data.num_of_philos = atoi(argv[1]);
-	pthread_mutex_init(&mutex, NULL);
-	
+	check_input(argc, argv);
+	data_init(&data, argv);
 	pthread_t philo[data.num_of_philos];
-	i = 0;
-	while(i < data.num_of_philos)
+	
+	pthread_mutex_init(&data.start_mutex, NULL);
+	pthread_mutex_lock(&data.start_mutex);
+	pthread_mutex_lock(&data.print_mutex);
+	if(data.start == true)
 	{
-		philo[i] = create_philo(i, &mutex, &data);
+		pthread_mutex_unlock(&data.start_mutex);
+		pthread_mutex_unlock(&data.print_mutex);
+	}
+	//CREATE MONITOR
+	if (pthread_create(&data.monitor, NULL, &monitor, &data))
+	{
+		printf("Error: Thread creation failed\n");
+		exit(1);
+	}
+	///CREATE PHILOS
+	i = 0;
+	while (i < data.num_of_philos) 
+	{
+		philo[i] = create_philo(i, &data);
 		i++;
 	}
-	i =0;
+
+	//JOIN
 	while(i < data.num_of_philos)
 	{
 		pthread_join(philo[i], NULL);
 		i++;
-	}	
-	printf("All philosophers have eaten %d times\n", data.philo->eat_count);
-  	pthread_mutex_destroy(&mutex);
+	}
+	pthread_join(data.monitor, NULL);
+	
+	//DESTROY
+	i = 0;
+	while(i < data.num_of_philos)
+	{
+		pthread_mutex_destroy(&data.forks[i]);
+		i++;
+	}
 	return (0);
 }
-
-// printf("%d %d has taken a fork",timestamp_in_ms, x);
-// printf("%d %d is eating",timestamp_in_ms, x);
-// printf("%d %d is sleeping",timestamp_in_ms, x);
-// printf("%d %d is thinking",timestamp_in_ms, x);
-// printf("%d %d died",timestamp_in_ms, x);

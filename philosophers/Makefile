@@ -14,11 +14,9 @@ p: all
 	./philosophers
 	
 clean:
-	$(MAKE) -C clean
 	rm -f $(OBJECTS)
 
 fclean: clean
-	$(MAKE) -C fclean
 	rm -rf philosophers
 
 re: fclean all
