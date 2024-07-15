@@ -6,32 +6,68 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/15 18:01:32 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/15 20:47:41 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-pthread_t	create_philo(int philo_num, t_data *data)
-{
-	t_philo *philo = &data->philo[philo_num];
-	philo->id = philo_num;
-	philo->left_fork = philo_num;
-	philo->right_fork = (philo_num + 1) % data->num_of_philos;
-	philo->eat_count = 0;
-	philo->last_eat_time = get_time();
-	printf(RED"Last eat time: %ld\n" RESET, philo->last_eat_time);
-	philo->data = data;
+void	init_philo(t_data *data)
+{ 
+	int i;
+	t_philo *philo;
 
-	if (pthread_create(&philo->thread_id, NULL, &routine, philo))
+	i = -1;
+	while (++i < data->num_of_philos) 
 	{
-		printf("Error: Thread creation failed\n");
+		philo = data->philo + i;
+		philo->id = i + 1;
+		philo->full = false;
+		philo->eat_count = 0;
+		philo->data = data;
+		
+		if (philo->id % 2 == 0)
+		{
+			philo->left_fork = &data->forks[i];
+			philo->right_fork = &data->forks[(i + 1) % data->num_of_philos];
+		}
+		else
+		{
+			philo->left_fork = &data->forks[(i + 1) % data->num_of_philos];
+			philo->right_fork = &data->forks[i];
+		}
+		//philo->last_eat_time = get_time();
+	}
+}
+
+void	create_philos(t_data *data)
+{
+	int i;
+
+	i = 0;
+	while (i < data->num_of_philos)
+	{
+		if (pthread_create(&data->philo[i].id, NULL, &routine, &data->philo[i]))
+		{
+			printf("Error: Thread creation failed\n");
+			exit(1);
+		}
+		i++;
+	}
+	set_bool(&data->start_mutex, &data->start, true);
+}
+
+void	*safe_malloc(size_t size)
+{
+	void *ptr;
+
+	ptr = malloc(size);
+	if (!ptr)
+	{
+		printf("Error: Memory allocation failed\n");
 		exit(1);
 	}
-	printf(BLU"Philosopher %d is created\n"RESET, philo->left_fork);
-	printf(MAG"Philosopher left fork %d\n"RESET, philo->left_fork);
-	printf(MAG"Philosopher right fork %d\n"RESET, philo->right_fork);	
-	return (philo->thread_id); 
+	return (ptr);
 }
 
 void	data_init(t_data *data, char **argv)
@@ -40,77 +76,91 @@ void	data_init(t_data *data, char **argv)
 
 	i = 0;
 	data->num_of_philos = ft_atol(argv[1]);
-	data->time_to_die = ft_atol(argv[2]);
-	data->time_to_eat = ft_atol(argv[3]);
-	data->time_to_sleep = ft_atol(argv[4]);
-	data->total_meals = ft_atol(argv[5]);
-	data->dead_philo = -1;
-	data->total_served = 0;
-	data->stop = false;
-	data->philo = malloc(sizeof(t_philo) * data->num_of_philos);
-	data->forks = malloc(sizeof(pthread_mutex_t) * data->num_of_philos);
-	//printf("Total meals: %ld\n", data->total_meals);
-	if (!data->philo || !data->forks)
+	data->time_to_die = ft_atol(argv[2]) * 1000; //*1000 to convert to milliseconds
+	data->time_to_eat = ft_atol(argv[3]) * 1000;
+	data->time_to_sleep = ft_atol(argv[4]) * 1000;
+	if(data->time_to_die < 60000 || data->time_to_eat < 60000 || data->time_to_sleep < 60000)
 	{
-		printf("Error: Memory allocation failed\n");
+		printf("Error: Time to die must be greater than 60\n");
 		exit(1);
 	}
-	i = 0;
+	if(argv[5])
+		data->total_meals = ft_atol(argv[5]);
+	else
+		data->total_meals = -1;
+	data->dead_philo = -1;
+	data->total_served = 0;
+	data->start = false;
+	data->stop = false;
+	data->philo = safe_malloc(sizeof(t_philo) * data->num_of_philos);
+	data->forks = safe_malloc(sizeof(pthread_mutex_t) * data->num_of_philos);
+	//printf("Total meals: %ld\n", data->total_meals);
+
 	while(i < data->num_of_philos)
 	{
 		pthread_mutex_init(&data->forks[i], NULL);
+		data->forks[i].id = i;
 		i++;
 	}
-	pthread_mutex_init(&data->print_mutex, NULL);
-	pthread_mutex_init(&data->total_served_mutex, NULL);
 	pthread_mutex_init(&data->start_mutex, NULL);
 
+	//pthread_mutex_init(&data->print_mutex, NULL);
+	//pthread_mutex_init(&data->total_served_mutex, NULL);
+
 	data->start_time = get_time();
-	data->start = true;
+}
+
+void	create_monitor(t_data *data)
+{
+	if (pthread_create(data->monitor, NULL, &monitor, &data))
+	{
+		printf("Error: Thread creation failed\n");
+		exit(1);
+	}
+}
+
+void	join_threads(t_data *data)
+{
+	int i;
+
+	i = 0;
+	while(i < data->num_of_philos)
+	{
+		pthread_join(data->philo[i].id, NULL);
+		i++;
+	}
+	pthread_join(data->monitor, NULL);
+}	
+
+void	destroy_threads(t_data *data)
+{
+	int i;
+
+	i = 0;
+	while(i < data->num_of_philos)
+	{
+		pthread_mutex_destroy(data->philo[i].id);
+		i++;
+	}
+	// pthread_mutex_destroy(data->print_mutex);
+	// pthread_mutex_destroy(data->total_served_mutex);
+	// pthread_mutex_destroy(data->start_mutex);
 }
 
 int main(int argc, char **argv)
 {
 	check_input(argc, argv);
-	
+	 
 	static t_data data;
 	int i;
 
 	data_init(&data, argv);
-	pthread_t philo[data.num_of_philos];
-	pthread_mutex_unlock(&data.start_mutex);
-	//CREATE MONITOR
-	if (pthread_create(&data.monitor, NULL, &monitor, &data))
-	{
-		printf("Error: Thread creation failed\n");
-		exit(1);
-	}
-	///CREATE PHILOS
-	i = 0;
-	while (i < data.num_of_philos && data.start==true) 
-	{
-		pthread_mutex_lock(&data.start_mutex);
-		philo[i] = create_philo(i, &data);
-		i++;
-	}
-	pthread_mutex_unlock(&data.start_mutex);
+	init_philo(&data);
 
-	i = 0;
-	//JOIN
-	while(i < data.num_of_philos)
-	{
-		pthread_join(philo[i], NULL);
-		i++;
-	}
-	pthread_join(data.monitor, NULL);
-	
-	//DESTROY
-	i = 0;
-	while(i < data.num_of_philos)
-	{
-		pthread_mutex_destroy(&data.forks[i]);
-		i++;
-	}
+	create_monitor(&data);
+	create_philos(&data);
+	join_threads(&data);
+	destroy_threads(&data);
 	pthread_mutex_destroy(&data.print_mutex);
 	pthread_mutex_destroy(&data.total_served_mutex);
 	pthread_mutex_destroy(&data.start_mutex);

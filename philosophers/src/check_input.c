@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:35:15 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/15 14:10:29 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/15 18:19:16 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,22 +41,24 @@ int check_input(int argc, char **argv)
 	int i;
 
 	i = 1;
-	printf("argc: %d\n", argc);
 	if(argc < 5 || argc > 6)
 	{
-		printf("Error: Wrong number of arguments\n");
-		return(0);
+		printf(RED "Error: Wrong number of arguments\n"RESET);
+		exit(EXIT_FAILURE);
 	}
-	if(atoi(argv[1]) < 1)
+	else
 	{
-		printf("Error: Number of philosophers must be greater than 0\n");
-		exit(1);
+		if(atoi(argv[1]) < 1)
+		{
+			printf(RED"Error: Number of philosophers must be greater than 0\n"RESET);
+			exit(EXIT_FAILURE);
+		}
+		
+		while (argv[i])
+		{
+			is_all_digit(argv[i]);	
+			i++;
+		}
 	}
-	
-	while (argv[i])
-	{
-		is_all_digit(argv[i]);	
-		i++;
-	}
-	return(1);	
+	return(0);	
 }

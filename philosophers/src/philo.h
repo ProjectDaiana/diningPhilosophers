@@ -31,11 +31,11 @@ typedef struct s_forks
 typedef struct s_philo
 {
 	int				id;
-	int				left_fork;
-	int				right_fork;
 	long			eat_count;
 	long 			last_eat_time;
 	bool			full;
+	t_forks			*left_fork;
+	t_forks			*right_fork;
 	pthread_t		thread_id;
 	struct s_data	*data;
 //	pthread_t		monitor;
@@ -55,7 +55,7 @@ typedef struct s_data
 	bool			start;
 	bool			stop;
 	uint64_t		start_time;
-	pthread_mutex_t	*forks;
+	t_forks			*forks;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t total_served_mutex;
 	pthread_mutex_t start_mutex;
@@ -71,5 +71,10 @@ uint64_t	get_time(void);
 uint64_t	get_elapsed_time(uint64_t start_time);
 
 long		ft_atol(const char *str);
+
+void		set_bool(pthread_mutex_t *mtx, bool *dest, bool val);
+bool		get_bool(pthread_mutex_t *mtx, bool *val);
+void		set_long(pthread_mutex_t *mtx, long *dest, long val);
+long		get_long(pthread_mutex_t *mtx, long *val);
 
 #endif
