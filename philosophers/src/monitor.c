@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 17:26:09 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/11 20:50:47 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/15 17:18:17 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int	all_full(t_data *data)
 	{
 		if (data->philo[i].eat_count < data->total_meals)
 			return (0);
+		data->philo[i].full = true;
 		i++;
 	}
 	return (1);
@@ -33,24 +34,23 @@ void	*monitor(void *arg)
 	while (1)
 	{
 		pthread_mutex_lock(&data->print_mutex);
-		if (data->total_served > data->total_meals && all_full(data) == 1)
+		if (data->total_served >= data->total_meals && all_full(data) == 1)
 		{
-			printf("All philosophers have eaten %ld times\n", data->total_served);
-			exit(0);
+			data->stop = true;
+			printf(RED"Philosophers have eaten %ld times\n"RESET, data->total_served);
+			pthread_mutex_unlock(&data->print_mutex);	
+			return (NULL);
 		}
-		if (data->dead_philo == true) 
+		pthread_mutex_unlock(&data->print_mutex);
+		
+		pthread_mutex_lock(&data->print_mutex);
+		if (data->dead_philo >= 0) 
 		{
-			printf(RED"PHILO IS DEAD!\n"RESET);
-			exit(0);
+			data->stop = true;
+			printf(RED"PHILO %d IS DEAD!\n"RESET, data->dead_philo);
+			return (NULL);
 		}
-		pthread_mutex_unlock(&data->print_mutex);	
+		pthread_mutex_unlock(&data->print_mutex);
+		usleep(100);
 	}
 }
-// if  (philo->last_eat_time < data->time_to_die + data->start_time)
-// {
-// 	printf(RED"Philosopher %d is dead\n"RESET, philo->left_fork);
-// 	data->dead_philo = true;	
-// 	pthread_mutex_unlock(&data->forks[philo->left_fork]);	
-// 	pthread_mutex_unlock(&data->forks[philo->right_fork]);
-// 	return (NULL);
-// }

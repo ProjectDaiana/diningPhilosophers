@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/11 20:33:11 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/15 18:01:32 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,11 @@ void	data_init(t_data *data, char **argv)
 	data->total_meals = ft_atol(argv[5]);
 	data->dead_philo = -1;
 	data->total_served = 0;
+	data->stop = false;
 	data->philo = malloc(sizeof(t_philo) * data->num_of_philos);
 	data->forks = malloc(sizeof(pthread_mutex_t) * data->num_of_philos);
 	//printf("Total meals: %ld\n", data->total_meals);
-	if (!data->philo)
+	if (!data->philo || !data->forks)
 	{
 		printf("Error: Memory allocation failed\n");
 		exit(1);
@@ -62,28 +63,22 @@ void	data_init(t_data *data, char **argv)
 	}
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->total_served_mutex, NULL);
+	pthread_mutex_init(&data->start_mutex, NULL);
+
 	data->start_time = get_time();
-	sleep(1);
 	data->start = true;
 }
 
 int main(int argc, char **argv)
 {
+	check_input(argc, argv);
+	
 	static t_data data;
 	int i;
 
-	check_input(argc, argv);
 	data_init(&data, argv);
 	pthread_t philo[data.num_of_philos];
-	
-	pthread_mutex_init(&data.start_mutex, NULL);
-	pthread_mutex_lock(&data.start_mutex);
-	pthread_mutex_lock(&data.print_mutex);
-	if(data.start == true)
-	{
-		pthread_mutex_unlock(&data.start_mutex);
-		pthread_mutex_unlock(&data.print_mutex);
-	}
+	pthread_mutex_unlock(&data.start_mutex);
 	//CREATE MONITOR
 	if (pthread_create(&data.monitor, NULL, &monitor, &data))
 	{
@@ -92,12 +87,15 @@ int main(int argc, char **argv)
 	}
 	///CREATE PHILOS
 	i = 0;
-	while (i < data.num_of_philos) 
+	while (i < data.num_of_philos && data.start==true) 
 	{
+		pthread_mutex_lock(&data.start_mutex);
 		philo[i] = create_philo(i, &data);
 		i++;
 	}
+	pthread_mutex_unlock(&data.start_mutex);
 
+	i = 0;
 	//JOIN
 	while(i < data.num_of_philos)
 	{
@@ -113,5 +111,10 @@ int main(int argc, char **argv)
 		pthread_mutex_destroy(&data.forks[i]);
 		i++;
 	}
+	pthread_mutex_destroy(&data.print_mutex);
+	pthread_mutex_destroy(&data.total_served_mutex);
+	pthread_mutex_destroy(&data.start_mutex);
+	free(data.philo);
+	free(data.forks);
 	return (0);
 }

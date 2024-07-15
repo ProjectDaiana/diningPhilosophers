@@ -22,11 +22,11 @@
 
 struct s_data;
 
-// typedef struct s_forks
-// {
-// 	pthread_mutex_t	mutex;
-// 	int				id;
-// } t_forks;
+typedef struct s_forks
+{
+	pthread_mutex_t	mutex;
+	int				id;
+} t_forks;
 
 typedef struct s_philo
 {
@@ -35,7 +35,7 @@ typedef struct s_philo
 	int				right_fork;
 	long			eat_count;
 	long 			last_eat_time;
-
+	bool			full;
 	pthread_t		thread_id;
 	struct s_data	*data;
 //	pthread_t		monitor;
@@ -46,31 +46,30 @@ typedef struct s_philo
 typedef struct s_data
 {
 	long			num_of_philos;
-	long			time_to_die;
+	unsigned long	time_to_die;
 	long			time_to_eat;
 	long			time_to_sleep;
 	long			total_meals;
 	long			total_served;
 	int				dead_philo;
 	bool			start;
-	//t_forks			*forks;
+	bool			stop;
+	uint64_t		start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t total_served_mutex;
 	pthread_mutex_t start_mutex;
 	pthread_t		monitor;
-	t_philo *philo;
-	uint64_t		start_time;
+	t_philo			*philo;
 } t_data;
 
-int check_input(int argc, char **argv);
+int			check_input(int argc, char **argv);
+void		*routine(void *arg);
+void		*monitor(void *arg);
 
 uint64_t	get_time(void);
 uint64_t	get_elapsed_time(uint64_t start_time);
 
-void	*routine(void *arg);
-void	*monitor(void *arg);
-
-long	ft_atol(const char *str);
+long		ft_atol(const char *str);
 
 #endif
