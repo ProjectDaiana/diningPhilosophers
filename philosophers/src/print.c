@@ -1,27 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time.c                                             :+:      :+:    :+:   */
+/*   print.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/05 17:50:42 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/16 17:28:07 by darotche         ###   ########.fr       */
+/*   Created: 2024/07/16 17:29:09 by darotche          #+#    #+#             */
+/*   Updated: 2024/07/16 17:43:08 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	get_time(void)
+void	print_message_mtx(t_philo *philo, char *message, char *color)
 {
-	struct timeval	tv;
+	long elapsed_time;
 
-	if(gettimeofday(&tv, NULL))
-		exit(1);
-	return ((long)(tv.tv_sec) * 1000 + (tv.tv_usec / 1000)); // returns time in milliseconds
-}
+	elapsed_time = get_elapsed_time(philo->data->start_time);
+	pthread_mutex_lock(&philo->data->print_mutex);
 
-long get_elapsed_time(long start_time)
-{
-    return (get_time() - start_time);
+	printf("%s%ld Philosopher %ld %s\n"RESET, color, elapsed_time, philo->id, message);
+	pthread_mutex_unlock(&philo->data->print_mutex);
 }

@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/15 20:27:37 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/15 20:34:18 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/16 15:34:37 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,34 +14,34 @@
 
 void	set_bool(pthread_mutex_t *mtx, bool *dest, bool val)
 {
-	pthread_mutex_lock(&mtx);
+	pthread_mutex_lock(mtx);
 	*dest = val;
-	pthread_mutex_unlock(&mtx);
+	pthread_mutex_unlock(mtx);
 }
 
 bool	get_bool(pthread_mutex_t *mtx, bool *val)
 {
 	bool res;
 
-	pthread_mutex_lock(&mtx);
+	pthread_mutex_lock(mtx);
 	res = *val;
-	pthread_mutex_unlock(&mtx);
+	pthread_mutex_unlock(mtx);
 	return (res);
 }
 
 void	set_long(pthread_mutex_t *mtx, long *dest, long val)
 {
-	pthread_mutex_lock(&mtx);
+	pthread_mutex_lock(mtx);
 	*dest = val;
-	pthread_mutex_unlock(&mtx);
+	pthread_mutex_unlock(mtx);
 }
 
 long	get_long(pthread_mutex_t *mtx, long *val)
 {
 	long res;
 
-	pthread_mutex_lock(&mtx);
+	pthread_mutex_lock(mtx);
 	res = *val;
-	pthread_mutex_unlock(&mtx);
+	pthread_mutex_unlock(mtx);
 	return (res);
 }
