@@ -37,10 +37,10 @@ typedef struct s_philo
 	t_forks			*left_fork;
 	t_forks			*right_fork;
 	pthread_t		th_id;
-	struct s_data	*data;
+	pthread_mutex_t	ph_mutex;
 //	pthread_t		monitor;
 //	t_forks			forks;
-//	pthread_mutex_t	mutex;
+	struct s_data	*data;
 } t_philo;
 
 typedef struct s_data
@@ -65,6 +65,8 @@ typedef struct s_data
 
 int			check_input(int argc, char **argv);
 void		*routine(void *arg);
+void		get_forks_mtx(t_philo *philo);
+void		put_forks_mtx(t_philo *philo);
 void		*monitor(void *arg);
 
 long		get_time(void);
