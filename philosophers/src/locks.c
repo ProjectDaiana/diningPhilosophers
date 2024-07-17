@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/16 17:29:09 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/16 22:09:16 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/17 20:00:01 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,16 @@ void	print_message_mtx(t_philo *philo, char *message, char *color)
 void get_forks_mtx(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->left_fork->mutex);
-	print_message_mtx(philo, "has taken left fork", WHT);
+	print_message_mtx(philo, "has taken left fork", CYN);
 	pthread_mutex_lock(&philo->right_fork->mutex);
-	print_message_mtx(philo, "has taken right fork", WHT);
+	print_message_mtx(philo, "has taken right fork", CYN);
 }
 
 void	put_forks_mtx(t_philo *philo)
 {
 	pthread_mutex_unlock(&philo->left_fork->mutex);
+	print_message_mtx(philo, "has left left fork", BLU);
 	pthread_mutex_unlock(&philo->right_fork->mutex);
+	print_message_mtx(philo, "has left right fork", BLU);
+		print_message_mtx(philo, "has finished eating", GRN);
 }

@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/16 16:39:59 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/17 19:31:58 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	init_philo(t_data *data)
 		philo->full = false;
 		philo->eat_count = 0;
 		philo->data = data;
+		pthread_mutex_init(&philo->ph_mutex, NULL);
 		
 		if (philo->id % 2 == 0)
 		{
@@ -87,16 +88,15 @@ void	data_init(t_data *data, char **argv)
 		exit(1);
 	}
 	if(argv[5])
-		data->total_meals = ft_atol(argv[5]);
+		data->num_of_meals = ft_atol(argv[5]);
 	else
-		data->total_meals = -1;
+		data->num_of_meals = -1;
 	data->dead_philo = -1;
 	data->total_served = 0;
 	data->start = false;
-	data->stop = false;
 	data->philo = safe_malloc(sizeof(t_philo) * data->num_of_philos);
 	data->forks = safe_malloc(sizeof(t_forks) * data->num_of_philos);
-	//printf("Total meals: %ld\n", data->total_meals);
+	//printf("Total meals: %ld\n", data->num_of_meals);
 
 	while(i < data->num_of_philos)
 	{
