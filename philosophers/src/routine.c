@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/03 18:39:43 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/17 20:05:39 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/17 23:44:52 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,10 @@ void	eat(t_philo *philo, t_data *data)
 	print_message_mtx(philo, "is eating", YEL);
 	usleep(data->time_to_eat);
 	if (data->num_of_meals > 0 && philo->eat_count == data->num_of_meals)
+	{
 		set_bool(&philo->ph_mutex, &philo->full, true);
-
+		print_message_mtx(philo, "is full", RED);
+	}
 	// if (philo->id == 2)
 	// 	philo->eat_count = 20;
 	//printf(CYN"Ph %ld Eat count = %ld\n"RESET,philo->id, philo->eat_count);
@@ -29,15 +31,6 @@ void	eat(t_philo *philo, t_data *data)
 	//printf(CYN"Ph %ld Last eat time: %ld\n"RESET, philo->id, philo->last_eat_time);
 	//printf(CYN"Ph %ld New eat count = %ld\n"RESET,philo->id, philo->eat_count);
 	put_forks_mtx(philo);
-}
-
-void	is_dead(t_philo *philo)
-{
-	long current_time;
-
-	current_time = get_time();
-	if(current_time - philo->last_eat_time >= philo->data->time_to_die)
-		philo->data->dead_philo = philo->id;
 }
 
 void	*routine(void *arg)
@@ -49,11 +42,18 @@ void	*routine(void *arg)
 	data = philo->data;
 	while (!get_bool(&data->start_mutex, &data->start))
 		;
-	while (data->start)
+	set_long(&philo->ph_mutex, &philo->last_eat_time, get_time());
+	
+	pthread_mutex_lock(&data->total_served_mutex);
+	data->total_served++; /// Increase the number of meals served
+	//print data->total_served
+	pthread_mutex_unlock(&data->total_served_mutex);
+
+	while (!data->end)
 	{
 		if (philo->full)
 			break ;
-		is_dead(philo);
+		//is_dead(philo);
 		eat(philo, data);
 		print_message_mtx(philo, "is sleeping", MAG);
 		usleep(data->time_to_sleep);

@@ -1,30 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time.c                                             :+:      :+:    :+:   */
+/*   safe_malloc.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/05 17:50:42 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/17 22:15:51 by darotche         ###   ########.fr       */
+/*   Created: 2024/07/17 21:12:47 by darotche          #+#    #+#             */
+/*   Updated: 2024/07/17 21:12:54 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-long	get_time(void)
+void	*safe_malloc(size_t size)
 {
-	struct timeval	tv;
+	void *ptr;
 
-	if(gettimeofday(&tv, NULL))
+	ptr = malloc(size);
+	if (!ptr)
 	{
-		printf("Error: gettimeofday failed\n");
+		printf("Error: Memory allocation failed\n");
 		exit(1);
 	}
-	return ((long)(tv.tv_sec) * 1000 + (tv.tv_usec / 1000)); // returns time in milliseconds
-}
-
-long get_elapsed_time(long start_time)
-{
-    return (get_time() - start_time);
+	return (ptr);
 }

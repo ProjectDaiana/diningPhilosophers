@@ -38,7 +38,6 @@ typedef struct s_philo
 	t_forks			*right_fork;
 	pthread_t		th_id;
 	pthread_mutex_t	ph_mutex;
-//	pthread_t		monitor;
 	struct s_data	*data;
 } t_philo;
 
@@ -49,24 +48,27 @@ typedef struct s_data
 	long			time_to_eat;
 	long			time_to_sleep;
 	long			num_of_meals;
-
-	long			total_served;////
-	int				dead_philo;
+	bool			end;
 	bool			start;
 	long			start_time;
-	t_forks			*forks;
+	long			total_served;
 	pthread_mutex_t	print_mutex;
-	pthread_mutex_t total_served_mutex;
+	pthread_mutex_t total_served_mutex;////
 	pthread_mutex_t start_mutex;
-	pthread_t		monitor;//
+	pthread_t		monitor;
 	t_philo			*philo;
+	t_forks			*forks;
 } t_data;
 
 int			check_input(int argc, char **argv);
 void		*routine(void *arg);
+void		print_message_mtx(t_philo *philo, char *message, char *color);
+long		ft_atol(const char *str);
+void		*safe_malloc(size_t size);
 void		get_forks_mtx(t_philo *philo);
 void		put_forks_mtx(t_philo *philo);
 void		*monitor(void *arg);
+bool		all_thr_running(pthread_mutex_t	*mutex, long *threads, long num_of_philos);
 
 long		get_time(void);
 long		get_elapsed_time(long start_time);
@@ -76,7 +78,5 @@ bool		get_bool(pthread_mutex_t *mtx, bool *val);
 void		set_long(pthread_mutex_t *mtx, long *dest, long val);
 long		get_long(pthread_mutex_t *mtx, long *val);
 
-void		print_message_mtx(t_philo *philo, char *message, char *color);
-long		ft_atol(const char *str);
 
 #endif

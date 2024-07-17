@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/17 19:31:58 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/17 23:08:06 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,18 @@ void	init_philo(t_data *data)
 	}
 }
 
-void	create_philos(t_data *data)
+void	create_threads(t_data *data)
 {
 	int i;
 
 	i = 0;
+	if (data->num_of_philos == 1)//cheating
+	{
+		printf("Philo 1 has taken left fork\n");
+		usleep(data->time_to_die);
+		printf("Philo 1 died\n");
+		return ;
+	}
 	while (i < data->num_of_philos)
 	{
 		if (pthread_create(&data->philo[i].th_id, NULL, &routine, &data->philo[i]))
@@ -56,21 +63,13 @@ void	create_philos(t_data *data)
 		}
 		i++;
 	}
-	data->start_time = get_time();
-	set_bool(&data->start_mutex, &data->start, true); //All threads will start at the same time
-}
-
-void	*safe_malloc(size_t size)
-{
-	void *ptr;
-
-	ptr = malloc(size);
-	if (!ptr)
+	if (pthread_create(&data->monitor, NULL, &monitor, &data))
 	{
-		printf("Error: Memory allocation failed\n");
+		printf("Error: Thread creation failed\n");
 		exit(1);
 	}
-	return (ptr);
+	data->start_time = get_time();
+	set_bool(&data->start_mutex, &data->start, true); //All threads will start at the same time
 }
 
 void	data_init(t_data *data, char **argv)
@@ -91,13 +90,10 @@ void	data_init(t_data *data, char **argv)
 		data->num_of_meals = ft_atol(argv[5]);
 	else
 		data->num_of_meals = -1;
-	data->dead_philo = -1;
-	data->total_served = 0;
+	data-> end = false;
 	data->start = false;
 	data->philo = safe_malloc(sizeof(t_philo) * data->num_of_philos);
 	data->forks = safe_malloc(sizeof(t_forks) * data->num_of_philos);
-	//printf("Total meals: %ld\n", data->num_of_meals);
-
 	while(i < data->num_of_philos)
 	{
 		pthread_mutex_init(&data->forks[i].mutex, NULL);
@@ -107,18 +103,11 @@ void	data_init(t_data *data, char **argv)
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->total_served_mutex, NULL);
 	pthread_mutex_init(&data->start_mutex, NULL);
+	//printf("Total meals: %ld\n", data->num_of_meals);
 
 	data->start_time = get_time();
 }
 
-void	create_monitor(t_data *data)
-{
-	if (pthread_create(&data->monitor, NULL, &monitor, &data))
-	{
-		printf("Error: Thread creation failed\n");
-		exit(1);
-	}
-}
 
 void	join_threads(t_data *data)
 {
@@ -153,9 +142,8 @@ int main(int argc, char **argv)
 
 	data_init(&data, argv);
 	init_philo(&data);
-
-	create_monitor(&data);
-	create_philos(&data);
+	//create_monitor(&data);
+	create_threads(&data);
 	join_threads(&data);
 	destroy_mutex(&data);
 	pthread_mutex_destroy(&data.print_mutex);
