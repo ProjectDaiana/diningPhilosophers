@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/17 23:08:06 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/21 16:57:01 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void	init_philo(t_data *data)
 	long i;
 	t_philo *philo;
 
-	i = -1;
-	while (++i < data->num_of_philos) 
+	i = 0;
+	while (i < data->num_of_philos) 
 	{
 		philo = data->philo + i;
 		philo->id = i + 1;
@@ -38,30 +38,38 @@ void	init_philo(t_data *data)
 			philo->left_fork = &data->forks[(i + 1) % data->num_of_philos];
 			philo->right_fork = &data->forks[i];
 		}
-		//philo->last_eat_time = get_time();
+		philo->last_eat_time = get_time();
+		i++;
 	}
 }
+
 
 void	create_threads(t_data *data)
 {
 	int i;
 
 	i = 0;
-	if (data->num_of_philos == 1)//cheating
+	// if (data->num_of_meals == 0)
+	// 	return ;
+	if (data->num_of_philos == 1)
 	{
-		printf("Philo 1 has taken left fork\n");
-		usleep(data->time_to_die);
-		printf("Philo 1 died\n");
-		return ;
+       if (pthread_create(&data->philo[0].thr_id, NULL, &lone_ph, &data->philo[0]))
+        {
+            printf("Error: Thread creation failed\n");
+            exit(1);
+        }
 	}
-	while (i < data->num_of_philos)
+	else
 	{
-		if (pthread_create(&data->philo[i].th_id, NULL, &routine, &data->philo[i]))
+		while (i < data->num_of_philos)
 		{
-			printf("Error: Thread creation failed\n");
-			exit(1);
+			if (pthread_create(&data->philo[i].thr_id, NULL, &routine, &data->philo[i]))
+			{
+				printf("Error: Thread creation failed\n");
+				exit(1);
+			}
+			i++;
 		}
-		i++;
 	}
 	if (pthread_create(&data->monitor, NULL, &monitor, &data))
 	{
@@ -70,6 +78,7 @@ void	create_threads(t_data *data)
 	}
 	data->start_time = get_time();
 	set_bool(&data->start_mutex, &data->start, true); //All threads will start at the same time
+	printf("All threads started\n");
 }
 
 void	data_init(t_data *data, char **argv)
@@ -78,10 +87,10 @@ void	data_init(t_data *data, char **argv)
 
 	i = 0;
 	data->num_of_philos = ft_atol(argv[1]);
-	data->time_to_die = ft_atol(argv[2]) * 1000; //*1000 to convert to milliseconds
-	data->time_to_eat = ft_atol(argv[3]) * 1000;
-	data->time_to_sleep = ft_atol(argv[4]) * 1000;
-	if(data->time_to_die < 60000 || data->time_to_eat < 60000 || data->time_to_sleep < 60000)
+	data->time_to_die = ft_atol(argv[2]); //*1000 to convert to milliseconds
+	data->time_to_eat = ft_atol(argv[3]);
+	data->time_to_sleep = ft_atol(argv[4]);
+	if(data->time_to_die < 60 || data->time_to_eat < 60 || data->time_to_sleep < 60)
 	{
 		printf("Error: Time to die must be greater than 60\n");
 		exit(1);
@@ -101,11 +110,10 @@ void	data_init(t_data *data, char **argv)
 		i++;
 	}
 	pthread_mutex_init(&data->print_mutex, NULL);
-	pthread_mutex_init(&data->total_served_mutex, NULL);
+	pthread_mutex_init(&data->thr_running_mutex, NULL);
 	pthread_mutex_init(&data->start_mutex, NULL);
-	//printf("Total meals: %ld\n", data->num_of_meals);
-
 	data->start_time = get_time();
+	data->thr_running = 0;
 }
 
 
@@ -116,23 +124,13 @@ void	join_threads(t_data *data)
 	i = 0;
 	while(i < data->num_of_philos)
 	{
-		pthread_join(data->philo[i].th_id, NULL);
+		pthread_join(data->philo[i].thr_id, NULL);
+		printf("Philo %ld joined\n", data->philo[i].id);
 		i++;
 	}
 	pthread_join(data->monitor, NULL);
+	printf("All threads joined\n");
 }	
-
-void	destroy_mutex(t_data *data)
-{
-	int i;
-
-	i = 0;
-	while(i < data->num_of_philos)
-	{
-		pthread_mutex_destroy(&data->forks[i].mutex);
-		i++;
-	}
-}
 
 int main(int argc, char **argv)
 {
@@ -142,14 +140,10 @@ int main(int argc, char **argv)
 
 	data_init(&data, argv);
 	init_philo(&data);
-	//create_monitor(&data);
+	//printf(WHT"Data initialized\n"RESET);
 	create_threads(&data);
 	join_threads(&data);
-	destroy_mutex(&data);
-	pthread_mutex_destroy(&data.print_mutex);
-	pthread_mutex_destroy(&data.total_served_mutex);
-	pthread_mutex_destroy(&data.start_mutex);
-	free(data.philo);
-	free(data.forks);
+	free_and_destroy(&data);
+
 	return (0);
 }

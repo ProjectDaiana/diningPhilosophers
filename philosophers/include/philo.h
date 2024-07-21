@@ -36,7 +36,7 @@ typedef struct s_philo
 	bool			full;
 	t_forks			*left_fork;
 	t_forks			*right_fork;
-	pthread_t		th_id;
+	pthread_t		thr_id;
 	pthread_mutex_t	ph_mutex;
 	struct s_data	*data;
 } t_philo;
@@ -51,9 +51,9 @@ typedef struct s_data
 	bool			end;
 	bool			start;
 	long			start_time;
-	long			total_served;
+	long			thr_running;
 	pthread_mutex_t	print_mutex;
-	pthread_mutex_t total_served_mutex;////
+	pthread_mutex_t thr_running_mutex;////
 	pthread_mutex_t start_mutex;
 	pthread_t		monitor;
 	t_philo			*philo;
@@ -62,6 +62,7 @@ typedef struct s_data
 
 int			check_input(int argc, char **argv);
 void		*routine(void *arg);
+void		*lone_ph(void *arg);
 void		print_message_mtx(t_philo *philo, char *message, char *color);
 long		ft_atol(const char *str);
 void		*safe_malloc(size_t size);
@@ -78,5 +79,6 @@ bool		get_bool(pthread_mutex_t *mtx, bool *val);
 void		set_long(pthread_mutex_t *mtx, long *dest, long val);
 long		get_long(pthread_mutex_t *mtx, long *val);
 
+void		free_and_destroy(t_data *data);
 
 #endif
