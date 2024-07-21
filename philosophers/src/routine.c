@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/03 18:39:43 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/21 17:36:03 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/21 18:46:43 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ void	*routine(void *arg)
 
 	while (!get_bool(&data->start_mutex, &data->start))// wait for all threads to start
 		;
+	// printf(YEL"philo->data->num_of_philos: %ld\n"RESET, data->num_of_philos);
+	// printf(YEL"philo->data->num_of_meals: %ld\n"RESET, data->num_of_meals);
 	set_long(&philo->ph_mutex, &philo->last_eat_time, get_time());// get time last meal
 	
 	pthread_mutex_lock(&data->thr_running_mutex);
@@ -70,6 +72,8 @@ void	*lone_ph(void *arg)
 	philo = (t_philo *)arg;
 	data = philo->data;
 	printf("time to die %ld\n", data->time_to_die);
+	printf("Num of philos %ld\n", data->num_of_philos);
+	printf("Num of meals %ld\n", data->num_of_meals);
 	while (!get_bool(&data->start_mutex, &data->start))// wait for all threads to start
 		;
 	set_long(&philo->ph_mutex, &philo->last_eat_time, get_time());// get time last meal

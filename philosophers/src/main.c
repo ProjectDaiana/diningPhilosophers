@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/21 16:57:01 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/21 19:14:17 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ void	init_philo(t_data *data)
 		philo->full = false;
 		philo->eat_count = 0;
 		philo->data = data;
+		// printf("philo->data->num_of_philos: %ld\n", philo->data->num_of_philos);
+		// printf("philo->data->num_of_meals: %ld\n", philo->data->num_of_meals);
 		pthread_mutex_init(&philo->ph_mutex, NULL);
 		
 		if (philo->id % 2 == 0)
@@ -53,14 +55,13 @@ void	create_threads(t_data *data)
 	// 	return ;
 	if (data->num_of_philos == 1)
 	{
-       if (pthread_create(&data->philo[0].thr_id, NULL, &lone_ph, &data->philo[0]))
-        {
-            printf("Error: Thread creation failed\n");
-            exit(1);
-        }
+		if (pthread_create(&data->philo[0].thr_id, NULL, &lone_ph, &data->philo[0]))
+		{
+			printf("Error: Thread creation failed\n");
+			exit(1);
+		}
 	}
-	else
-	{
+	else {
 		while (i < data->num_of_philos)
 		{
 			if (pthread_create(&data->philo[i].thr_id, NULL, &routine, &data->philo[i]))
@@ -71,7 +72,7 @@ void	create_threads(t_data *data)
 			i++;
 		}
 	}
-	if (pthread_create(&data->monitor, NULL, &monitor, &data))
+	if (pthread_create(&data->monitor, NULL, &monitor, data))
 	{
 		printf("Error: Thread creation failed\n");
 		exit(1);
@@ -87,6 +88,7 @@ void	data_init(t_data *data, char **argv)
 
 	i = 0;
 	data->num_of_philos = ft_atol(argv[1]);
+	printf("Num of philos: %ld\n", data->num_of_philos);
 	data->time_to_die = ft_atol(argv[2]); //*1000 to convert to milliseconds
 	data->time_to_eat = ft_atol(argv[3]);
 	data->time_to_sleep = ft_atol(argv[4]);
@@ -114,6 +116,7 @@ void	data_init(t_data *data, char **argv)
 	pthread_mutex_init(&data->start_mutex, NULL);
 	data->start_time = get_time();
 	data->thr_running = 0;
+	//printf(data->num_of_meals == -1 ? "Number of meals: Unlimited\n" : "Number of meals: %ld\n", data->num_of_meals);
 }
 
 
