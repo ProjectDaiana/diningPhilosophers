@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/17 21:12:47 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/17 21:12:54 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/22 19:35:01 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	*safe_malloc(size_t size)
 {
-	void *ptr;
+	void	*ptr;
 
 	ptr = malloc(size);
 	if (!ptr)

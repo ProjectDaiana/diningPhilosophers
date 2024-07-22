@@ -1,22 +1,23 @@
-cc		= gcc
+cc		= cc
 CFLAGS  = -Wall -Werror -Wextra -Iinclude
 
+NAME = philosophers
 SRCDIR = src
 SOURCES := $(shell find $(SRCDIR) -name '*.c')  
 OBJECTS := $(SOURCES:.c=.o)
 
-philosophers: $(OBJECTS)
+$(NAME): $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(OBJECTS) $(LDFLAGS) 
 
-all: philosophers
+all: $(NAME)
 
 p: all
-	./philosophers
+	./$(NAME)
 	
 clean:
 	rm -f $(OBJECTS)
 
 fclean: clean
-	rm -rf philosophers
+	rm -rf $(NAME)
 
 re: fclean all

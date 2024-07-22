@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/15 20:27:37 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/16 15:34:37 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/22 19:28:46 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	set_bool(pthread_mutex_t *mtx, bool *dest, bool val)
 
 bool	get_bool(pthread_mutex_t *mtx, bool *val)
 {
-	bool res;
+	bool	res;
 
 	pthread_mutex_lock(mtx);
 	res = *val;
@@ -38,10 +38,17 @@ void	set_long(pthread_mutex_t *mtx, long *dest, long val)
 
 long	get_long(pthread_mutex_t *mtx, long *val)
 {
-	long res;
+	long	res;
 
 	pthread_mutex_lock(mtx);
 	res = *val;
 	pthread_mutex_unlock(mtx);
 	return (res);
+}
+
+void	increase_long(pthread_mutex_t *mutex, long *val)
+{
+	pthread_mutex_lock(mutex);
+	*val = *val + 1;
+	pthread_mutex_unlock(mutex);
 }

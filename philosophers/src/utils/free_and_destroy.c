@@ -6,19 +6,18 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:23:39 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/21 18:17:08 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/22 19:35:47 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-
 void	destroy_mutex(t_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
-	while(i < data->num_of_philos)
+	while (i < data->n_of_ph)
 	{
 		pthread_mutex_destroy(&data->forks[i].mutex);
 		i++;
@@ -27,16 +26,16 @@ void	destroy_mutex(t_data *data)
 
 void	free_and_destroy(t_data *data)
 {
-	long i;
+	long	i;
 
 	i = 0;
-	while (i < data->num_of_philos)
+	while (i < data->n_of_ph)
 	{
 		pthread_mutex_destroy(&data->philo[i].ph_mutex);
 		i++;
 	}
 	i = 0;
-	while (i < data->num_of_philos)
+	while (i < data->n_of_ph)
 	{
 		pthread_mutex_destroy(&data->forks[i].mutex);
 		i++;
@@ -46,5 +45,4 @@ void	free_and_destroy(t_data *data)
 	pthread_mutex_destroy(&data->start_mutex);
 	free(data->philo);
 	free(data->forks);
-	free(data);
 }

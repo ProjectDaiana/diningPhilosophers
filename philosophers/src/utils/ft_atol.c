@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 19:43:31 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/03 20:36:44 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/22 19:28:20 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ long	ft_atol(const char *str)
 
 	i = 0;
 	neg = 1;
-	num = 0;	
+	num = 0;
 	while (str[i] == ' ' || str[i] == '\f' || str[i] == '\n'
 		|| str[i] == '\r' || str[i] == '\t' || str[i] == '\v')
 		i++;

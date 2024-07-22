@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 17:50:42 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/17 22:15:51 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/22 19:33:58 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,15 @@ long	get_time(void)
 {
 	struct timeval	tv;
 
-	if(gettimeofday(&tv, NULL))
+	if (gettimeofday(&tv, NULL))
 	{
 		printf("Error: gettimeofday failed\n");
-		exit(1);
+		exit (EXIT_FAILURE);
 	}
-	return ((long)(tv.tv_sec) * 1000 + (tv.tv_usec / 1000)); // returns time in milliseconds
+	return ((long)(tv.tv_sec) *1000 + (tv.tv_usec / 1000));
 }
 
-long get_elapsed_time(long start_time)
+long	get_elapsed_time(long start_time)
 {
-    return (get_time() - start_time);
+	return (get_time() - start_time);
 }

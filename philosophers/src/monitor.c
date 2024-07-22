@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 17:26:09 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/21 19:18:26 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/22 19:44:52 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 int	all_full(t_data *data)
 {
-	int i;
+	int	i;
 
 	i = 0;
-	while (i < data->num_of_philos)
+	while (i < data->n_of_ph)
 	{
 		if (data->philo[i].eat_count < data->num_of_meals)
 			return (0);
@@ -27,14 +27,14 @@ int	all_full(t_data *data)
 	return (1);
 }
 
-bool	all_thr_running(pthread_mutex_t	*mutex, long *threads, long num_of_philos)
+bool	all_thr_run(pthread_mutex_t	*mutex, long *threads, long n_of_ph)
 {
-	bool ret;
-	
+	bool	ret;
+
 	ret = false;
-	//printf("Checking threads: %ld / %ld\n", threads, num_of_philos);
+	//printf("Checking threads: %ld / %ld\n", threads, n_of_ph);
 	pthread_mutex_lock(mutex);
-	if (*threads == num_of_philos)
+	if (*threads == n_of_ph)
 		ret = true;
 	pthread_mutex_unlock(mutex);
 	return (ret);
@@ -42,52 +42,49 @@ bool	all_thr_running(pthread_mutex_t	*mutex, long *threads, long num_of_philos)
 
 bool	ph_died(t_philo *philo)
 {
-	long elapsed_time;	
-	elapsed_time = get_elapsed_time(philo->last_eat_time);
+	long	elapsed_time;
 
-//	printf(RED"time %ld\n"RESET, elapsed_time);
+	elapsed_time = get_elapsed_time(philo->last_eat_time);
+	//	printf(RED"time %ld\n"RESET, elapsed_time);
 	if (get_bool(&philo->ph_mutex, &philo->full))
 		return (false);
 	//printf(RED"Time since last eat: %ld\n"RESET, elapsed_time);
 	//printf(RED "Time to die: %ld ms\n" RESET, philo->data->time_to_die);
-	if(elapsed_time > philo->data->time_to_die)
+	//pthread_mutex_lock(&philo->data->thr_running_mutex);
+	if (elapsed_time > philo->data->time_to_die)
 		return (true);
+//	pthread_mutex_unlock(&philo->data->thr_running_mutex);
 	return (false);
 }
 
 void	*monitor(void *arg)
 {
-	t_data *data;
-	
-	int i;
+	t_data	*data;
+	int		i;
 
 	data = (t_data *)arg;
-	printf(WHT"num of philos %ld\n"RESET, data->num_of_philos);
-	while(!all_thr_running(&data->thr_running_mutex, &data->thr_running, data->num_of_philos))
-		;
-	printf("%ld Running\n", data->thr_running);
-	pthread_mutex_lock(&data->print_mutex);
-	printf("Monitoring started\n");
-	pthread_mutex_unlock(&data->print_mutex);
+	while (!all_thr_run(&data->thr_running_mutex, &data->thr_running, data->n_of_ph))
+		usleep(1000);
 	// pthread_mutex_lock(&data->print_mutex);
-	//  printf("Checking threads: %ld / %ld\n", data->thr_running, data->num_of_philos);
+	// printf("Monitoring started\n");
+	// pthread_mutex_unlock(&data->print_mutex);
+	// pthread_mutex_lock(&data->print_mutex);
+	//  printf("Checking threads: %ld / %ld\n", data->thr_running, data->n_of_ph);
 	//  printf(RED"Total served = %ld\n"RESET, data->thr_running);
 	// pthread_mutex_unlock(&data->print_mutex);
 	while (!(data->end))
 	{
 		i = 0;
-		while (i < data->num_of_philos)
+		while (i < data->n_of_ph && !data->end)
 		{
 			if (ph_died(data->philo + i) == true)
 			{
-				print_message_mtx(data->philo, "is dead", RED);
+				print_message_mtx(data->philo, "died", RED);
 				set_bool(&data->thr_running_mutex, &data->end, true);
 				break ;
 			}
 			i++;
 		}
-		pthread_mutex_lock(&data->print_mutex);
-    	pthread_mutex_unlock(&data->print_mutex);
 	}
 	return (NULL);
 }
