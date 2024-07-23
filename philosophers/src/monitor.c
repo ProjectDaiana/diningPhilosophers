@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 17:26:09 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 17:47:58 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 20:04:20 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,8 @@ void	*monitor(void *arg)
 		{
 			if (ph_died(data->philo + i) == true)
 			{
-				print_message_mtx(data->philo, "died", RED);
+				print_message_mtx(data->philo, "died");
+				//print_message_mtx(data->philo, "died", RED);
 				set_bool(&data->thr_running_mutex, &data->end, true);
 				break ;
 			}

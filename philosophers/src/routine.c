@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/03 18:39:43 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 17:49:29 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 20:05:29 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ void	eat(t_philo *philo, t_data *data)
 	//ph_meals = get_long(&philo->ph_mutex, &philo->eat_count);
 	set_long(&philo->ph_mutex, &philo->last_eat_time, get_time());
 	increase_long(&philo->ph_mutex, &philo->eat_count);
-	print_message_mtx(philo, "is eating", YEL);
+	print_message_mtx(philo, "is eating");
+	//print_message_mtx(philo, "is eating", YEL);
 	usleep(data->time_to_eat * 1000);
 	if (data->num_of_meals > 0 && philo->eat_count == data->num_of_meals)
 	{
@@ -55,9 +56,11 @@ void	*routine(void *arg)
 			break ;
 		}
 		eat(philo, data);
-		print_message_mtx(philo, "is sleeping", MAG);
+		print_message_mtx(philo, "is sleeping");
+		//print_message_mtx(philo, "is sleeping", MAG);
 		usleep(data->time_to_sleep * 1000);
-		print_message_mtx(philo, "is thinking", MAG);
+		print_message_mtx(philo, "is thinking");
+		//print_message_mtx(philo, "is thinking", MAG);
 		usleep(1000);
 	}
 	return (NULL);
@@ -77,7 +80,8 @@ void	*lone_ph_routine(void *arg)
 		usleep(1000);
 	set_long(&philo->ph_mutex, &philo->last_eat_time, get_time());// get time last meal
 	increase_long(&data->thr_running_mutex, &data->thr_running); /// Increase the number of meals served
-	print_message_mtx(philo, "takes first fork", CYN);
+	print_message_mtx(philo, "takes first fork");
+	//print_message_mtx(philo, "takes first fork", CYN);
 	//printf("lone philo threads running %ld\n", data->thr_running);
 	//while (!data->end)
 	while (!get_bool(&data->thr_running_mutex, &data->end))

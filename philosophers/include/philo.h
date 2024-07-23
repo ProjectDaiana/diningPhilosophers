@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 19:23:01 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 17:13:10 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 20:03:50 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,8 @@ typedef struct s_data
 int			check_input(int argc, char **argv);
 void		*routine(void *arg);
 void		*lone_ph_routine(void *arg);
-void		print_message_mtx(t_philo *philo, char *message, char *color);
+void		print_message_mtx(t_philo *philo, char *message);
+//void		print_message_mtx(t_philo *philo, char *message, char *color);
 long		ft_atol(const char *str);
 void		*safe_malloc(size_t size);
 void		get_forks_mtx(t_philo *philo);
