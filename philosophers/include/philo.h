@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 19:23:01 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 20:03:50 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 21:04:47 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ typedef struct s_data
 	bool			end;
 	bool			start;
 	long			start_time;
-	long			thr_running;
+	long			thr_run;
 	pthread_mutex_t	print_mutex;
-	pthread_mutex_t	thr_running_mutex;
+	pthread_mutex_t	thr_run_mutex;
 	pthread_mutex_t	start_mutex;
 	pthread_t		monitor;
 	t_philo			*philo;
@@ -72,28 +72,29 @@ typedef struct s_data
 }	t_data;
 
 int			check_input(int argc, char **argv);
-void		*routine(void *arg);
-void		*lone_ph_routine(void *arg);
-void		print_message_mtx(t_philo *philo, char *message);
-//void		print_message_mtx(t_philo *philo, char *message, char *color);
-long		ft_atol(const char *str);
-void		*safe_malloc(size_t size);
-void		get_forks_mtx(t_philo *philo);
-void		put_forks_mtx(t_philo *philo);
+void		init_philo(t_data *data);
+void		create_threads(t_data *data);
+void		init_mutex(t_data *data);
+void		data_init(t_data *data, char **argv);
+void		join_threads(t_data *data);
+
 void		*monitor(void *arg);
 bool		all_thr_run(pthread_mutex_t	*mutex, long *threads, long n_of_ph);
-
+void		*routine(void *arg);
+void		get_forks_mtx(t_philo *philo);
+void		put_forks_mtx(t_philo *philo);
+void		*lone_routine(void *arg);
+void		print_message_mtx(t_philo *philo, char *message, char *color);
+long		ft_atol(const char *str);
+void		*safe_malloc(size_t size);
 long		get_time(void);
 long		get_elapsed_time(long start_time);
-
 void		set_bool(pthread_mutex_t *mtx, bool *dest, bool val);
 bool		get_bool(pthread_mutex_t *mtx, bool *val);
 void		set_long(pthread_mutex_t *mtx, long *dest, long val);
 long		get_long(pthread_mutex_t *mtx, long *val);
 void		increase_long(pthread_mutex_t *mutex, long *val);
-
-bool	ph_died(t_philo *philo);
-
+bool		ph_died(t_philo *philo);
 void		free_and_destroy(t_data *data);
 
 #endif

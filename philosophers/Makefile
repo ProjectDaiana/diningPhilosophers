@@ -1,10 +1,6 @@
 cc		= cc
 CFLAGS  = -Wall -Werror -Wextra -Iinclude
 
-# CC = gcc
-# CFLAGS = -Wall -Wextra -Iinclude -g -fsanitize=thread
-# LDFLAGS = -fsanitize=thread
-
 NAME = philosophers
 SRCDIR = src
 SOURCES := $(shell find $(SRCDIR) -name '*.c')  
