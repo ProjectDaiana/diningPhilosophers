@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 15:45:14 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 16:55:55 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ void	join_threads(t_data *data)
 		i++;
 	}
 //	set_bool(&data->end_mutex, &data->end, true);
-	set_bool(&data->end_mutex, &data->end, true);
+	set_bool(&data->thr_running_mutex, &data->end, true);
 	pthread_join(data->monitor, NULL);
 	//printf("All threads joined\n");
 }

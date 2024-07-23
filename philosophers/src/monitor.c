@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 17:26:09 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 16:18:50 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 16:47:18 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,10 @@ bool	all_thr_run(pthread_mutex_t	*mutex, long *threads, long n_of_ph)
 bool	ph_died(t_philo *philo)
 {
 	long	elapsed_time;
-	long	ph_lastmeal_time;
+//	long	ph_lastmeal_time;
 
-	ph_lastmeal_time = get_long(&philo->ph_mutex, &philo->last_eat_time);
-	elapsed_time = get_elapsed_time(ph_lastmeal_time);
+	//ph_lastmeal_time = get_long(&philo->ph_mutex, &philo->last_eat_time);
+	elapsed_time = get_elapsed_time(philo->last_eat_time);
 	//	printf(RED"time %ld\n"RESET, elapsed_time);
 	if (get_bool(&philo->ph_mutex, &philo->full))
 		return (false);
@@ -60,17 +60,16 @@ void	*monitor(void *arg)
 	//  printf(RED"Total served = %ld\n"RESET, data->thr_running);
 	// pthread_mutex_unlock(&data->print_mutex);
 	
-	//while (!data->end)
-	while(get_bool(&data->end_mutex, &data->end) == false)
+	//while(get_bool(&data->end_mutex, &data->end) == false)
+	while (!(data->end))
 	{
 		i = 0;
-		while (i < data->n_of_ph && !get_bool(&data->end_mutex, &data->end))
+		while (i < data->n_of_ph && !data->end)
 		{
 			if (ph_died(data->philo + i) == true)
 			{
-				set_bool(&data->end_mutex, &data->end, true);
 				print_message_mtx(data->philo, "died", RED);
-			//	exit (0);
+				set_bool(&data->thr_running_mutex, &data->end, true);
 				break ;
 			}
 			i++;
