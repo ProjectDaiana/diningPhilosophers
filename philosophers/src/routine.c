@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/03 18:39:43 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 16:51:04 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 17:49:29 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 void	eat(t_philo *philo, t_data *data)
 {
 	get_forks_mtx(philo);
-	// long	ph_meals;
+	//long	ph_meals;
 
-	// ph_meals = get_long(&philo->ph_mutex, &philo->eat_count);
+	//ph_meals = get_long(&philo->ph_mutex, &philo->eat_count);
 	set_long(&philo->ph_mutex, &philo->last_eat_time, get_time());
 	increase_long(&philo->ph_mutex, &philo->eat_count);
 	print_message_mtx(philo, "is eating", YEL);
@@ -58,7 +58,7 @@ void	*routine(void *arg)
 		print_message_mtx(philo, "is sleeping", MAG);
 		usleep(data->time_to_sleep * 1000);
 		print_message_mtx(philo, "is thinking", MAG);
-		usleep(2000);
+		usleep(1000);
 	}
 	return (NULL);
 }
@@ -80,7 +80,7 @@ void	*lone_ph_routine(void *arg)
 	print_message_mtx(philo, "takes first fork", CYN);
 	//printf("lone philo threads running %ld\n", data->thr_running);
 	//while (!data->end)
-	while (!get_bool(&data->end_mutex, &data->end))
+	while (!get_bool(&data->thr_running_mutex, &data->end))
 		usleep(1000);
 	return (NULL);
 }

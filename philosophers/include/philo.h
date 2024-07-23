@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 19:23:01 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 16:06:16 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 17:13:10 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ typedef struct s_data
 	pthread_mutex_t	print_mutex;
 	pthread_mutex_t	thr_running_mutex;
 	pthread_mutex_t	start_mutex;
-	pthread_mutex_t	end_mutex;
 	pthread_t		monitor;
 	t_philo			*philo;
 	t_forks			*forks;

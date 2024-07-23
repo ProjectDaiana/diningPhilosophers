@@ -1,5 +1,9 @@
-cc		= cc
-CFLAGS  = -Wall -Werror -Wextra -Iinclude
+# cc		= cc
+# CFLAGS  = -Wall -Werror -Wextra -Iinclude
+
+CC = gcc
+CFLAGS = -Wall -Wextra -Iinclude -g -fsanitize=address -fsanitize=undefined
+LDFLAGS = -fsanitize=address -fsanitize=undefined
 
 NAME = philosophers
 SRCDIR = src

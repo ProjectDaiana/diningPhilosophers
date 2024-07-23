@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/20 15:35:15 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 12:51:17 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 17:39:41 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,6 @@ int	check_for_alpha(int argc, char **argv)
 
 int	check_input(int argc, char **argv)
 {
-	int	i;
-
-	i = 1;
 	if (argc < 5 || argc > 6)
 	{
 		printf(RED "Wrong number of arguments\n"RESET);

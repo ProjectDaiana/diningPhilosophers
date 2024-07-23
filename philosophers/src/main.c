@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/19 16:25:24 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/23 16:55:55 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 17:58:38 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,6 @@ void	data_init(t_data *data, char **argv)
 	pthread_mutex_init(&data->print_mutex, NULL);
 	pthread_mutex_init(&data->thr_running_mutex, NULL);
 	pthread_mutex_init(&data->start_mutex, NULL);
-	pthread_mutex_init(&data->end_mutex, NULL);
 	data->start_time = get_time();
 	data->thr_running = 0;
 }
@@ -123,7 +122,6 @@ void	join_threads(t_data *data)
 		//printf("Philo %ld joined\n", data->philo[i].id);
 		i++;
 	}
-//	set_bool(&data->end_mutex, &data->end, true);
 	set_bool(&data->thr_running_mutex, &data->end, true);
 	pthread_join(data->monitor, NULL);
 	//printf("All threads joined\n");
@@ -133,7 +131,8 @@ int	main(int argc, char **argv)
 {
 	static t_data	data;
 
-	check_input(argc, argv);
+	if (check_input(argc, argv))
+		return (1);
 	data_init(&data, argv);
 	init_philo(&data);
 	create_threads(&data);
