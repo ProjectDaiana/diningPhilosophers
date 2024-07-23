@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/22 19:23:01 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/22 19:26:45 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 16:06:16 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,8 @@ bool		get_bool(pthread_mutex_t *mtx, bool *val);
 void		set_long(pthread_mutex_t *mtx, long *dest, long val);
 long		get_long(pthread_mutex_t *mtx, long *val);
 void		increase_long(pthread_mutex_t *mutex, long *val);
+
+bool	ph_died(t_philo *philo);
 
 void		free_and_destroy(t_data *data);
 

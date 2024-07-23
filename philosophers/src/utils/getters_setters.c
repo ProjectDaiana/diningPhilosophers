@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/15 20:27:37 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/22 19:28:46 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 15:09:19 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,6 @@ long	get_long(pthread_mutex_t *mtx, long *val)
 void	increase_long(pthread_mutex_t *mutex, long *val)
 {
 	pthread_mutex_lock(mutex);
-	*val = *val + 1;
+	(*val)++;
 	pthread_mutex_unlock(mutex);
 }

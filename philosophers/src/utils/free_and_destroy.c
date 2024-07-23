@@ -6,7 +6,7 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/21 13:23:39 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/22 19:35:47 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 15:44:47 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ void	free_and_destroy(t_data *data)
 	pthread_mutex_destroy(&data->print_mutex);
 	pthread_mutex_destroy(&data->thr_running_mutex);
 	pthread_mutex_destroy(&data->start_mutex);
+	pthread_mutex_destroy(&data->end_mutex);
 	free(data->philo);
 	free(data->forks);
 }

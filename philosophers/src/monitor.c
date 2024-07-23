@@ -6,26 +6,11 @@
 /*   By: darotche <darotche@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/05 17:26:09 by darotche          #+#    #+#             */
-/*   Updated: 2024/07/22 19:44:52 by darotche         ###   ########.fr       */
+/*   Updated: 2024/07/23 16:18:50 by darotche         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-
-int	all_full(t_data *data)
-{
-	int	i;
-
-	i = 0;
-	while (i < data->n_of_ph)
-	{
-		if (data->philo[i].eat_count < data->num_of_meals)
-			return (0);
-		data->philo[i].full = true;
-		i++;
-	}
-	return (1);
-}
 
 bool	all_thr_run(pthread_mutex_t	*mutex, long *threads, long n_of_ph)
 {
@@ -43,8 +28,10 @@ bool	all_thr_run(pthread_mutex_t	*mutex, long *threads, long n_of_ph)
 bool	ph_died(t_philo *philo)
 {
 	long	elapsed_time;
+	long	ph_lastmeal_time;
 
-	elapsed_time = get_elapsed_time(philo->last_eat_time);
+	ph_lastmeal_time = get_long(&philo->ph_mutex, &philo->last_eat_time);
+	elapsed_time = get_elapsed_time(ph_lastmeal_time);
 	//	printf(RED"time %ld\n"RESET, elapsed_time);
 	if (get_bool(&philo->ph_mutex, &philo->full))
 		return (false);
@@ -72,15 +59,18 @@ void	*monitor(void *arg)
 	//  printf("Checking threads: %ld / %ld\n", data->thr_running, data->n_of_ph);
 	//  printf(RED"Total served = %ld\n"RESET, data->thr_running);
 	// pthread_mutex_unlock(&data->print_mutex);
-	while (!(data->end))
+	
+	//while (!data->end)
+	while(get_bool(&data->end_mutex, &data->end) == false)
 	{
 		i = 0;
-		while (i < data->n_of_ph && !data->end)
+		while (i < data->n_of_ph && !get_bool(&data->end_mutex, &data->end))
 		{
 			if (ph_died(data->philo + i) == true)
 			{
+				set_bool(&data->end_mutex, &data->end, true);
 				print_message_mtx(data->philo, "died", RED);
-				set_bool(&data->thr_running_mutex, &data->end, true);
+			//	exit (0);
 				break ;
 			}
 			i++;
